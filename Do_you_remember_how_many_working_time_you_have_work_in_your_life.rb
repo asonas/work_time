@@ -39,12 +39,12 @@ module StarPlutinum
 
   class Fetcher
     attr_accessor :response
+
     def initialize
       @client = Esa::Client.new(access_token: ENV["ESA_ACCESS_TOKEN"], current_team: ENV["ESA_TEAM"])
       date = Time.parse(ARGV[0])
       @response = @client.posts(q: "user:asonas category:日報/#{date.strftime("%Y/%m")}")
     end
-
   end
 
   class Parser
@@ -128,10 +128,10 @@ module StarPlutinum
       def initialize(time)
         @day = 1
         @undecision_time = time
-        @time = if orver_day?
+        @hour = if orver_day?
           next_day!
         else
-          time
+          hour
         end
       end
 
@@ -144,9 +144,7 @@ module StarPlutinum
       end
 
       def orver_day?
-        return true if hour > 24
-        return true if minutes > 0
-        false
+        @undecision_time.gsub(":", "").to_i > 2401
       end
 
       def next_day!
@@ -155,7 +153,7 @@ module StarPlutinum
       end
 
       def relative_datetime
-        Time.parse("1/#{@day} #{@time}:#{minutes}")
+        Time.parse("1/#{@day} #{@hour}:#{minutes}")
       end
     end
   end
