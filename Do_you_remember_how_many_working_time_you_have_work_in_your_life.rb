@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'time'
 
 require 'pry'
+require 'awesome_print'
 
 module StarPlutinum
 
@@ -60,6 +61,7 @@ module StarPlutinum
         document.xpath("//h1").first.next_element.xpath("//tbody/tr").each do |tr|
           next if tr.elements[0].text == "合計"
           temp << {
+            title:      post["full_name"],
             place:      tr.elements[0].text,
             started_at: started_at(tr.elements[1].text),
             ended_at:   ended_at(tr.elements[1].text),
@@ -90,6 +92,10 @@ module StarPlutinum
 
     def initialize(work_time)
       @work_time_sections = work_time
+    end
+
+    def title
+      @work_time_sections.first[:title]
     end
 
     def started_at
@@ -158,6 +164,8 @@ end
 oraora = StarPlutinum::Ora.new
 
 oraora.each do |ora|
+  puts "-" * 10
+  puts ora.title
   puts "始業: #{ora.started_at}"
   puts "終業: #{ora.ended_at}"
   ora.calculate!
@@ -165,5 +173,6 @@ oraora.each do |ora|
   puts "働いていた場所: #{ora.places.join(',')}"
 end
 
+puts "/" * 30
 puts "働いていた日数: #{oraora.worked_days}"
 puts "今月働いていた時間: #{oraora.monthly_summing_work_time}"
